@@ -97,44 +97,48 @@ export default function Index() {
 
   const MannequinDisplay = () => {    
     return (
-      <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-        <div className="w-64 h-96 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center p-4">
-          <Icon name="User" size={120} className="text-gray-400 dark:text-gray-500 mb-4" />
+      <div className="flex flex-col items-center">
+        <div className="w-48 h-80 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 flex flex-col items-center justify-center p-4 relative">
+          <Icon name="User" size={100} className="text-gray-300 dark:text-gray-500" />
           
           {/* Outfit display */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            {mannequinOutfit.top && (
-              <div className="absolute top-16 w-20 h-16 bg-primary/20 rounded flex items-center justify-center">
-                <span className="text-xs text-center">{mannequinOutfit.top.name}</span>
-              </div>
-            )}
-            {mannequinOutfit.bottom && (
-              <div className="absolute top-32 w-16 h-20 bg-primary/20 rounded flex items-center justify-center">
-                <span className="text-xs text-center">{mannequinOutfit.bottom.name}</span>
-              </div>
-            )}
-            {mannequinOutfit.shoes && (
-              <div className="absolute bottom-16 w-12 h-8 bg-primary/20 rounded flex items-center justify-center">
-                <span className="text-xs text-center">{mannequinOutfit.shoes.name}</span>
-              </div>
-            )}
-            {mannequinOutfit.accessories && (
-              <div className="absolute top-12 right-4 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                <span className="text-xs">📱</span>
-              </div>
-            )}
-          </div>
+          {mannequinOutfit.top && (
+            <div className="absolute top-12 w-16 h-12 bg-black/10 rounded flex items-center justify-center">
+              <span className="text-xs text-center">{mannequinOutfit.top.name.slice(0, 10)}...</span>
+            </div>
+          )}
+          {mannequinOutfit.bottom && (
+            <div className="absolute top-28 w-12 h-16 bg-black/10 rounded flex items-center justify-center">
+              <span className="text-xs text-center">{mannequinOutfit.bottom.name.slice(0, 8)}...</span>
+            </div>
+          )}
+          {mannequinOutfit.shoes && (
+            <div className="absolute bottom-12 w-10 h-6 bg-black/10 rounded flex items-center justify-center">
+              <span className="text-xs text-center">{mannequinOutfit.shoes.name.slice(0, 6)}...</span>
+            </div>
+          )}
 
           {/* Hover preview */}
           {hoveredItem && (
             <div className="absolute inset-0 bg-primary/10 rounded-lg flex items-center justify-center">
-              <div className="text-center">
+              <div className="text-center p-2">
                 <p className="text-sm font-medium">{hoveredItem.name}</p>
-                <p className="text-xs text-muted-foreground">Наведите курсор для примерки</p>
+                <p className="text-xs text-muted-foreground">Примерка</p>
               </div>
             </div>
           )}
         </div>
+        
+        <Button 
+          className="mt-4 w-48"
+          onClick={() => {
+            const allItems = Object.values(mannequinOutfit).filter(Boolean);
+            allItems.forEach(item => addToCart(item!));
+          }}
+          disabled={Object.keys(mannequinOutfit).length === 0}
+        >
+          Добавить образ в корзину
+        </Button>
       </div>
     );
   };
@@ -151,24 +155,15 @@ export default function Index() {
         </div>
         <h3 className="font-medium text-sm mb-2">{item.name}</h3>
         <p className="text-lg font-light mb-3">{item.price.toLocaleString()} ₽</p>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="flex-1"
-            onClick={() => addToMannequin(item)}
-          >
-            <Icon name="Plus" size={16} className="mr-1" />
-            На маникен
-          </Button>
-          <Button
-            size="sm"
-            className="flex-1"
-            onClick={() => addToCart(item)}
-          >
-            В корзину
-          </Button>
-        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          className="w-full"
+          onClick={() => addToMannequin(item)}
+        >
+          <Icon name="Plus" size={16} className="mr-1" />
+          На маникен
+        </Button>
       </CardContent>
     </Card>
   );
@@ -214,30 +209,27 @@ export default function Index() {
       {/* Main Content */}
       <main className="pt-20 px-6">
         {currentView === 'home' ? (
-          <div className="max-w-7xl mx-auto relative">
-            {/* Mannequin */}
-            <MannequinDisplay />
-            
-            {/* Left Product Grid */}
-            <div className="absolute left-0 top-0 w-80">
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="w-full max-w-6xl grid grid-cols-3 gap-8 items-start">
+              {/* Left Product Grid */}
               <div className="grid grid-cols-2 gap-4">
                 {sampleClothing.slice(0, 3).map(item => (
                   <ProductCard key={item.id} item={item} />
                 ))}
               </div>
-            </div>
-            
-            {/* Right Product Grid */}
-            <div className="absolute right-0 top-0 w-80">
+              
+              {/* Center Mannequin */}
+              <div className="flex justify-center">
+                <MannequinDisplay />
+              </div>
+              
+              {/* Right Product Grid */}
               <div className="grid grid-cols-2 gap-4">
                 {sampleClothing.slice(3).map(item => (
                   <ProductCard key={item.id} item={item} />
                 ))}
               </div>
             </div>
-            
-            {/* Spacer for content */}
-            <div className="h-96"></div>
           </div>
         ) : (
           <div className="max-w-2xl mx-auto">
@@ -291,7 +283,7 @@ export default function Index() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-24 border-t bg-muted/30">
+      <footer className="border-t bg-muted/30 mt-auto">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="text-center">
             <h3 className="font-medium mb-4">Контакты</h3>
